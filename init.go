@@ -20,10 +20,18 @@ func Init(bizDescMap map[string]BizDesc) error {
 	for bizName, bizDesc := range bizDescMap {
 		transMap := make(map[SrcEventKey]Transition)
 		for _, transition := range bizDesc.Transitions {
-			transMap[SrcEventKey{
-				SrcState: transition.Src.StateId,
-				Event:    transition.Event,
-			}] = transition
+			for _, srcState := range transition.Src {
+				if _, ok := transMap[SrcEventKey{
+					SrcState: srcState.StateId,
+					Event:    transition.Event,
+				}]; ok {
+					return fmt.Errorf("duplicate transition %s", transition.Event)
+				}
+				transMap[SrcEventKey{
+					SrcState: srcState.StateId,
+					Event:    transition.Event,
+				}] = transition
+			}
 		}
 		globalBizTrans[bizName] = transMap
 	}

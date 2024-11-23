@@ -11,39 +11,51 @@ func testInit() {
 			Transitions: []Transition{
 				{
 					Event: "time_event",
-					Src: State{
-						StateId:   1,
-						StateName: "上班中",
-					},
-					Dst: []State{
+					Src: []State{
 						{
 							StateId:   1,
 							StateName: "上班中",
-							CondExpr:  "time == 10",
+						},
+					},
+					Dst: []DstState{
+						{
+							State: State{
+								StateId:   1,
+								StateName: "上班中",
+							},
+							CondExpr: "time == 10",
 						},
 						{
-							StateId:   2,
-							StateName: "午休中",
-							CondExpr:  "time == 12",
+							State: State{
+								StateId:   2,
+								StateName: "午休中",
+							},
+							CondExpr: "time == 12",
 						},
 						{
-							StateId:   3,
-							StateName: "下班状态",
-							CondExpr:  "time == 18",
+							State: State{
+								StateId:   3,
+								StateName: "下班中",
+							},
+							CondExpr: "time == 18",
 						},
 					},
 				},
 				{
 					Event: "time_event",
-					Src: State{
-						StateId:   2,
-						StateName: "午休中",
-					},
-					Dst: []State{
+					Src: []State{
 						{
-							StateId:   1,
-							StateName: "上班中",
-							CondExpr:  "time == 14",
+							StateId:   2,
+							StateName: "午休中",
+						},
+					},
+					Dst: []DstState{
+						{
+							State: State{
+								StateId:   1,
+								StateName: "上班中",
+							},
+							CondExpr: "time == 14",
 						},
 					},
 				},
