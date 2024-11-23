@@ -4,13 +4,16 @@ import (
 	"fmt"
 )
 
-func NewFsm(biz string, curState int) *Fsm {
+func NewFsm(biz string, curState int) (*Fsm, error) {
+	if _, ok := globalBizTrans[biz]; !ok {
+		return nil, fmt.Errorf("biz %s not exist", biz)
+	}
 	fsm := &Fsm{
 		bizName:  biz,
 		curState: curState,
 	}
 	fsm.transMap = globalBizTrans[biz]
-	return fsm
+	return fsm, nil
 }
 
 // true 意味着可以转移到下一个状态
