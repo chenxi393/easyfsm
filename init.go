@@ -16,7 +16,6 @@ var (
 // 程序启动时 初始化状态机
 func Init(bizDescMap map[string]BizDesc) error {
 	// globalBizDesc = bizDescMap
-
 	for bizName, bizDesc := range bizDescMap {
 		transMap := make(map[SrcEventKey]Transition)
 		for _, transition := range bizDesc.Transitions {
@@ -38,6 +37,9 @@ func Init(bizDescMap map[string]BizDesc) error {
 	for _, transMap := range globalBizTrans {
 		for _, transition := range transMap {
 			for _, desState := range transition.Dst {
+				if desState.CondExpr == "" {
+					continue
+				}
 				expression, err := govaluate.NewEvaluableExpression(desState.CondExpr)
 				if err != nil {
 					return errors.Join(err, fmt.Errorf("invalid expression %s", desState.CondExpr))
@@ -48,9 +50,4 @@ func Init(bizDescMap map[string]BizDesc) error {
 	}
 	// 是否需要校验状态机是否正确？
 	return nil
-}
-
-type SrcEventKey struct {
-	SrcState int
-	Event    string
 }

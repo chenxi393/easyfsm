@@ -4,6 +4,18 @@ import (
 	"fmt"
 )
 
+// 状态机
+type Fsm struct {
+	bizName  string // 业务之间状态转移是隔离的 需要提前初始化
+	curState int
+	transMap map[SrcEventKey]Transition // 状态转移map
+}
+
+type SrcEventKey struct {
+	SrcState int
+	Event    string
+}
+
 func NewFsm(biz string, curState int) (*Fsm, error) {
 	if _, ok := globalBizTrans[biz]; !ok {
 		return nil, fmt.Errorf("biz %s not exist", biz)
@@ -38,18 +50,22 @@ func (f *Fsm) Tran(event string, paras map[string]interface{}) error {
 	}]
 	// 执行状态转移
 	for _, desState := range transition.Dst {
-		if desState.CondExpr == "" {
+		if desState.CondExpr == "" && len(paras) == 0 {
 			f.curState = desState.StateId
 			return nil
 		}
 		// 执行条件表达式
-		result, err := globalExpression[desState.CondExpr].Evaluate(paras)
+		expression, ok := globalExpression[desState.CondExpr]
+		if !ok {
+			continue
+		}
+		result, err := expression.Evaluate(paras)
 		if err != nil {
 			return err
 		}
 		resultBool, ok := result.(bool)
 		if !ok {
-			return fmt.Errorf("invalid expression %s", desState.CondExpr)
+			continue
 		}
 		if resultBool {
 			f.curState = desState.StateId
@@ -61,11 +77,4 @@ func (f *Fsm) Tran(event string, paras map[string]interface{}) error {
 
 func (f *Fsm) CurState() int {
 	return f.curState
-}
-
-// 状态机
-type Fsm struct {
-	bizName  string // 业务之间状态转移是隔离的 需要提前初始化
-	curState int
-	transMap map[SrcEventKey]Transition // 状态转移map
 }
