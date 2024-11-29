@@ -11,17 +11,20 @@
 ## 示例代码
 以下是一个简单的状态机实现示例：
 ```go
-func TestCanNot(t *testing.T) {
+func TestConditionTran(t *testing.T) {
 	testInit()
-	fms := NewFsm("test", 1)
-	params := make(map[string]interface{})
-	params["time"] = 10
-	err := fms.Tran("time_event", params)
+	fsm, err := NewFsm("order_test", 40)
 	if err != nil {
 		t.Error(err)
 	}
-	if fms.curState != 1 {
-		t.Error("curState is not 1")
+	para := make(map[string]interface{})
+	para["customer_received"] = 0
+	err = fsm.Tran("OrderDeliveredEt", para)
+	if err != nil {
+		t.Error(err)
+	}
+	if fsm.curState != 60 {
+		t.Error("curState is not 60")
 	}
 }
 ```
